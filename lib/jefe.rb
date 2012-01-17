@@ -1,7 +1,7 @@
 require 'eventmachine'
 require 'pty'
-require 'term/ansicolor'
 require 'thor'
+require 'thor/shell/color'
 
 class Jefe
 	def initialize
@@ -47,18 +47,30 @@ class Jefe
 end
 
 class Jefe::ColorPrinter
-	Color = Term::ANSIColor
+	Color = Thor::Shell::Color
 	COLORS = [:cyan, :yellow, :green, :magenta, :red]
 	def initialize
 		@colors ||= {"system" => :white}
 		@longest_seen = 0
 	end
+	def set_color color, string
+		color = Color.const_get color.to_s.upcase
+		"#{color}#{string}#{Color::CLEAR}"
+	end
+	def color_for type
+		@colors[type] ||= COLORS.shift.tap {|c| COLORS.push c}
+	end
+	def padding_for name
+		@longest_seen = name.size if name.size > @longest_seen
+		" " * (@longest_seen - name.length)
+	end
+	def datetime
+		Time.now.strftime '%H:%M:%S'
+	end
 	def out name, command
 		type = name.match(/^([A-Za-z0-9_]+).\d+$/) ? $1 : name
-		@colors[type] = COLORS.shift.tap {|c| COLORS.push c} unless @colors[type]
-		color = @colors[type]
-		@longest_seen = name.size if name.size > @longest_seen
-		puts "#{Color.send color} #{Time.now.strftime '%H:%M:%S'} #{name}#{' ' * (@longest_seen - name.length)} | #{Color.reset}#{command.chomp}"
+		color = color_for type
+		puts set_color(color, "#{datetime} #{name}#{padding_for name} | ")  + command.chomp
 	end
 end
 

@@ -12,7 +12,6 @@ spec = Gem::Specification.new do |s|
 	s.homepage = "http://github.com/mikemaltese/jefe"
 
 	s.add_dependency "eventmachine"
-	s.add_dependency "term-ansicolor"
 	s.add_dependency "thor"
 
 	s.executable = "jefe"
