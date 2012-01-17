@@ -51,12 +51,14 @@ class Jefe::ColorPrinter
 	COLORS = [:cyan, :yellow, :green, :magenta, :red]
 	def initialize
 		@colors ||= {"system" => :white}
+		@longest_seen = 0
 	end
 	def out name, command
 		type = name.match(/^([A-Za-z0-9_]+).\d+$/) ? $1 : name
 		@colors[type] = COLORS.shift.tap {|c| COLORS.push c} unless @colors[type]
 		color = @colors[type]
-		puts "#{Color.send color} #{Time.now.strftime '%H:%M:%S'} #{name}#{' ' * (9 - name.length)} | #{Color.reset}#{command.chomp}"
+		@longest_seen = name.size if name.size > @longest_seen
+		puts "#{Color.send color} #{Time.now.strftime '%H:%M:%S'} #{name}#{' ' * (@longest_seen - name.length)} | #{Color.reset}#{command.chomp}"
 	end
 end
 
