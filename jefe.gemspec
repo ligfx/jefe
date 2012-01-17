@@ -1,6 +1,9 @@
+require "./lib/jefe"
+require "./lib/jefe/version"
+
 spec = Gem::Specification.new do |s|
 	s.name = "jefe"
-	s.version = "1.0.0"
+	s.version = Jefe::VERSION
 	s.summary = "The featherweight Procfile manager"
 	s.description = "Through the magic of Thor and EventMachine, we give you the equivalent to Foreman in just 200 lines of sweet unadulterated Ruby."
 	
