@@ -60,9 +60,9 @@ class Jefe::ColorPrinter
 	def color_for type
 		@colors[type] ||= COLORS.shift.tap {|c| COLORS.push c}
 	end
-	def padding_for name
+	def padded name
 		@longest_seen = name.size if name.size > @longest_seen
-		" " * (@longest_seen - name.length)
+		name.ljust(@longest_seen)
 	end
 	def datetime
 		Time.now.strftime '%H:%M:%S'
@@ -70,7 +70,7 @@ class Jefe::ColorPrinter
 	def out name, command
 		type = name.match(/^([A-Za-z0-9_]+).\d+$/) ? $1 : name
 		color = color_for type
-		puts set_color(color, "#{datetime} #{name}#{padding_for name} | ")  + command.chomp
+		puts set_color(color, "#{datetime} #{padded name} | ")  + command.chomp
 	end
 end
 
