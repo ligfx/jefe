@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
+require 'jefe'
 require 'jefe/cli'
 Jefe::CLI.start

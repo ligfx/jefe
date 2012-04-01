@@ -1,7 +1,8 @@
 require 'thor'
 
-require 'jefe'
 require 'jefe/color_printer'
+require 'jefe/em'
+require 'jefe/loader'
 require 'jefe/version'
 
 class Jefe::CLI < Thor
@@ -17,17 +18,19 @@ class Jefe::CLI < Thor
 	def start(*args)
 		error("#{procfile} does not exist") unless File.exists? procfile
 		
-		engine = Jefe.new
-		engine.load File.read(procfile)
-		engine.printer = Jefe::ColorPrinter.new
-		engine.backend = Jefe::EM.new(engine.printer)
+		loader = Jefe::Loader.new File.read procfile
+		engine = Jefe::EM.new(Jefe::ColorPrinter.new)
 		
-		names = args.empty? ? engine.process_types.keys : args
 		trap("INT") do
 			puts
 			engine.stop
 		end
-		engine.start concurrency(names), port
+		names = args.empty? ? loader.process_types.keys : args
+		engine.start do
+			loader.tasks(concurrency(names), port).each do |(name, command)|
+				engine.add name, command
+			end
+		end
 	end
 	
 	def help(*args)
@@ -43,18 +46,18 @@ private
 	end
 	
 	def concurrency names
+		ret = {}
 		if options[:concurrency]
-			options[:concurrency].split(",").reduce({}) do |tot, kv|
+			options[:concurrency].split(",").each do |kv|
 				k, v = kv.split "="
-				tot[k] = v.to_i
-				tot
+				ret[k] = v.to_i
 			end
 		else
-			names.reduce({}) do |tot, name|
-				tot[name] = 1
-				tot
+			names.each do |name|
+				ret[name] = 1
 			end
 		end
+		ret
 	end
 	
 	def procfile
