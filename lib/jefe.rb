@@ -48,9 +48,11 @@ class Jefe::EM
 	def initialize(printer)
 		@printer = printer
 		@connections = []
+		@state = :stopped
 	end
 	
 	def start
+		@state = :running
 		EM.run do
 			yield self
 		end
@@ -68,6 +70,7 @@ class Jefe::EM
 	end
 	
 	def stop
+		@state = :stopped
 		@connections.each &:stop
 		EM.stop
 	end
@@ -79,7 +82,7 @@ class Jefe::EM
 	
 	def unbind c
 		@connections.delete c
-		stop if @connections.empty?
+		stop unless @state == :stopped
 	end
 	
 	class ProcessHandler < EM::Connection
