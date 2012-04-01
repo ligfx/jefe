@@ -1,4 +1,7 @@
+require 'thor'
+
 require 'jefe'
+require 'jefe/color_printer'
 require 'jefe/version'
 
 class Jefe::CLI < Thor
@@ -8,8 +11,8 @@ class Jefe::CLI < Thor
 	desc "start [COMMAND...]", "Start the application"
 	
 	method_option :env, :type => :string, :aliases => "-e", :desc => "Specify an environment file to load, defaults to .env"
-  method_option :port,        :type => :numeric, :aliases => "-p"
-  method_option :concurrency, :type => :string,  :aliases => "-c", :banner => '"alpha=5,bar=3"'
+	method_option :port,        :type => :numeric, :aliases => "-p"
+	method_option :concurrency, :type => :string,  :aliases => "-c", :banner => '"alpha=5,bar=3"'
 
 	def start(*args)
 		error("#{procfile} does not exist") unless File.exists? procfile
