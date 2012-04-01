@@ -5,7 +5,7 @@ spec = Gem::Specification.new do |s|
 	s.name = "jefe"
 	s.version = Jefe::VERSION
 	s.summary = "The featherweight Procfile manager"
-	s.description = "Through the magic of Thor and EventMachine, we give you the equivalent to Foreman in just 200 lines of sweet unadulterated Ruby."
+	s.description = "Through the magic of Thor and EventMachine, we give you a Foreman substitute in just 200 lines of sweet unadulterated Ruby."
 	
 	s.author = "Michael Maltese"
 	s.email = "michael.maltese@pomona.edu"
