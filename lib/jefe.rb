@@ -62,10 +62,8 @@ class Jefe::EM
 		PTY.spawn(command) do |output, input, pid|
 			input.close
 			
-			EM.attach output, ProcessHandler do |c|
-				c.init name, pid, @printer
-				bind(c)
-			end
+			opts = { :name => name, :pid => pid, :printer => @printer }
+			EM.attach output, ProcessHandler, opts, &method(:bind)
 		end
 	end
 	
@@ -89,11 +87,11 @@ class Jefe::EM
 		include EM::Protocols::LineText2
 		attr_accessor :engine, :name, :pid, :printer
 		
-		def init name, pid, printer
-			self.name = name
-			self.pid = pid
-			self.printer = printer
-			
+		def initialize(opts={})
+			self.name = opts[:name]
+			self.pid = opts[:pid]
+			self.printer = opts[:printer]
+
 			out "started with pid #{self.pid}"
 		end
 		
