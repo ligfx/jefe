@@ -25,9 +25,8 @@ class Jefe::CLI < Thor
 			puts
 			engine.stop
 		end
-		names = args.empty? ? loader.process_types.keys : args
 		engine.start do
-			loader.tasks(concurrency(names), port).each do |(name, command)|
+			loader.scale(concurrency_options(args), port).each do |(name, command)|
 				engine.add name, command
 			end
 		end
@@ -45,17 +44,11 @@ private
 		options[:port] || 5000
 	end
 	
-	def concurrency names
+	def concurrency_options names
 		ret = {}
-		if options[:concurrency]
-			options[:concurrency].split(",").each do |kv|
-				k, v = kv.split "="
-				ret[k] = v.to_i
-			end
-		else
-			names.each do |name|
-				ret[name] = 1
-			end
+		options[:concurrency].to_s.split(",").each do |kv|
+			k, v = kv.split "="
+			ret[k] = v.to_i
 		end
 		ret
 	end

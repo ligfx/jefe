@@ -1,17 +1,20 @@
 class Jefe::Loader
 	attr_reader :process_types
 	def initialize(file)
-		@process_types = {}
-		file.split("\n").each do |line|
-			if line =~ /^([A-Za-z0-9_]+):\s*(.+)$/
-				@process_types[$1] = $2
-			else
-				raise ArgumentError
-			end
+		@process_types = Hash[file.lines.map &method(:decompose_line)]
+	end
+	def decompose_line line
+		if line =~ /^([A-Za-z0-9_]+):\s*(.+)$/
+			[$1, $2]
+		else
+			raise ArgumentError
 		end
 	end
-	def tasks(concurrency, port)
+	def scale(concurrency, port)
 		tasks = []
+		if concurrency.empty?
+			concurrency = Hash[process_types.keys.map { |name| [name, 1] }]
+		end
 		concurrency.each do |(name, num)|
 			num.times do |i|
 				env = { "PORT" => (port + i) }
