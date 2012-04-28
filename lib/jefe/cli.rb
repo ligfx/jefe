@@ -10,13 +10,17 @@ class Jefe::CLI < Thor
 	class_option :procfile, :type => :string, :aliases => "-f", :desc => "Default: Procfile"
 	
 	desc "start [COMMAND...]", "Start the application"
+	default_task :start
 	
 	method_option :env, :type => :string, :aliases => "-e", :desc => "Specify an environment file to load, defaults to .env"
 	method_option :port,        :type => :numeric, :aliases => "-p"
 	method_option :concurrency, :type => :string,  :aliases => "-c", :banner => '"alpha=5,bar=3"'
 
 	def start(*args)
-		error("#{procfile} does not exist") unless File.exists? procfile
+		if ! File.exists? procfile
+			help
+			error("#{procfile} does not exist")
+		end
 		
 		loader = Jefe::Loader.new File.read procfile
 		engine = Jefe::EM.new(Jefe::ColorPrinter.new)
@@ -34,6 +38,7 @@ class Jefe::CLI < Thor
 	
 	def help(*args)
 		puts "Jefe #{Jefe::VERSION}, the featherweight Procfile manager"
+		puts "By default, calling `jefe' acts as `jefe start'. Your other options are:"
 		puts
 		super
 	end
