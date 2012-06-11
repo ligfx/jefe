@@ -6,6 +6,8 @@ class Jefe::Loader
 	def decompose_line line
 		if line =~ /^([A-Za-z0-9_]+):\s*(.+)$/
 			[$1, $2]
+		elsif line =~ /^#/
+			# Line is commented-out, ignore
 		else
 			raise ArgumentError
 		end
